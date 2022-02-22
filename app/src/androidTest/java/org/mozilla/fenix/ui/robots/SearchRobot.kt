@@ -6,6 +6,7 @@
 
 package org.mozilla.fenix.ui.robots
 
+import android.os.Build
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHasClickAction
@@ -67,12 +68,30 @@ class SearchRobot {
         }
     }
 
+    // Device or AVD requires a Google Services Android OS installation
     fun startVoiceSearch() {
         voiceSearchButton.click()
-        assertTrue(
-            mDevice.findObject(UiSelector().packageName("com.google.android.googlequicksearchbox"))
-                .exists()
-        )
+
+        // Accept runtime permission (API 30) for Google Voice
+        if (Build.VERSION.SDK_INT >= 30) {
+            val allowPermission = mDevice.findObject(
+                UiSelector().text(
+                    when {
+                        Build.VERSION.SDK_INT == 30 -> "Allow all the time"
+                        else -> "While using the app"
+                    }
+                )
+            )
+
+            if (allowPermission.exists()) {
+                allowPermission.click()
+            }
+
+            assertTrue(
+                mDevice.findObject(UiSelector().packageName("com.google.android.googlequicksearchbox"))
+                    .exists()
+            )
+        }
     }
 
     fun verifySearchEngineButton() = assertSearchButton()

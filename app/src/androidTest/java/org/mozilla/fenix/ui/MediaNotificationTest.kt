@@ -66,7 +66,7 @@ class MediaNotificationTest {
             assertPlaybackState(browserStore, MediaSession.PlaybackState.PLAYING)
         }.openNotificationShade {
             verifySystemNotificationExists(videoTestPage.title)
-            clickSystemNotificationControlButton("Pause")
+            clickMediaNotificationControlButton("Pause")
             verifyMediaSystemNotificationButtonState("Play")
         }
 
@@ -101,7 +101,7 @@ class MediaNotificationTest {
             assertPlaybackState(browserStore, MediaSession.PlaybackState.PLAYING)
         }.openNotificationShade {
             verifySystemNotificationExists("A site is playing media")
-            clickSystemNotificationControlButton("Pause")
+            clickMediaNotificationControlButton("Pause")
             verifyMediaSystemNotificationButtonState("Play")
         }
 

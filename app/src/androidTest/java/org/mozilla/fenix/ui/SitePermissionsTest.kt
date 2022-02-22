@@ -4,12 +4,15 @@
 
 package org.mozilla.fenix.ui
 
+import android.Manifest
 import androidx.core.net.toUri
+import androidx.test.rule.GrantPermissionRule
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.mozilla.fenix.customannotations.SmokeTest
 import org.mozilla.fenix.helpers.HomeActivityIntentTestRule
+import org.mozilla.fenix.helpers.RetryTestRule
 import org.mozilla.fenix.ui.robots.browserScreen
 import org.mozilla.fenix.ui.robots.navigationToolbar
 
@@ -25,6 +28,16 @@ class SitePermissionsTest {
     @get:Rule
     val activityTestRule = HomeActivityIntentTestRule()
 
+    @get:Rule
+    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
+        Manifest.permission.RECORD_AUDIO,
+        Manifest.permission.CAMERA
+    )
+
+    @Rule
+    @JvmField
+    val retryTestRule = RetryTestRule(3)
+
     @SmokeTest
     @Test
     fun audioVideoPermissionChoiceOnEachRequestTest() {
@@ -32,10 +45,6 @@ class SitePermissionsTest {
         }.enterURLAndEnterToBrowser(testPage.toUri()) {
             waitForPageToLoad()
         }.clickStartAudioVideoButton {
-            // allow app to record video
-            clickAppPermissionButton(true)
-            // allow app to record audio
-            clickAppPermissionButton(true)
             verifyAudioVideoPermissionPrompt(testPageSubstring)
         }.clickPagePermissionButton(false) {
             verifyPageContent("Camera and Microphone not allowed")
@@ -52,10 +61,6 @@ class SitePermissionsTest {
         }.enterURLAndEnterToBrowser(testPage.toUri()) {
             waitForPageToLoad()
         }.clickStartAudioVideoButton {
-            // allow app to record video
-            clickAppPermissionButton(true)
-            // allow app to record audio
-            clickAppPermissionButton(true)
             verifyAudioVideoPermissionPrompt(testPageSubstring)
             selectRememberPermissionDecision()
         }.clickPagePermissionButton(false) {
@@ -76,10 +81,6 @@ class SitePermissionsTest {
         }.enterURLAndEnterToBrowser(testPage.toUri()) {
             waitForPageToLoad()
         }.clickStartAudioVideoButton {
-            // allow app to record video
-            clickAppPermissionButton(true)
-            // allow app to record audio
-            clickAppPermissionButton(true)
             verifyAudioVideoPermissionPrompt(testPageSubstring)
             selectRememberPermissionDecision()
         }.clickPagePermissionButton(true) {
@@ -99,10 +100,7 @@ class SitePermissionsTest {
         navigationToolbar {
         }.enterURLAndEnterToBrowser(testPage.toUri()) {
         }.clickStartAudioVideoButton {
-            // allow app to record video
-            clickAppPermissionButton(false)
-            // allow app to record audio
-            clickAppPermissionButton(false)
+        }.clickPagePermissionButton(false) {
         }
         browserScreen {
             verifyPageContent("Camera and Microphone not allowed")
@@ -115,7 +113,6 @@ class SitePermissionsTest {
         }.enterURLAndEnterToBrowser(testPage.toUri()) {
             waitForPageToLoad()
         }.clickStartMicrophoneButton {
-            clickAppPermissionButton(true)
             verifyMicrophonePermissionPrompt(testPageSubstring)
         }.clickPagePermissionButton(false) {
             verifyPageContent("Microphone not allowed")
@@ -131,7 +128,6 @@ class SitePermissionsTest {
         }.enterURLAndEnterToBrowser(testPage.toUri()) {
             waitForPageToLoad()
         }.clickStartMicrophoneButton {
-            clickAppPermissionButton(true)
             verifyMicrophonePermissionPrompt(testPageSubstring)
             selectRememberPermissionDecision()
         }.clickPagePermissionButton(false) {
@@ -152,7 +148,6 @@ class SitePermissionsTest {
         }.enterURLAndEnterToBrowser(testPage.toUri()) {
             waitForPageToLoad()
         }.clickStartMicrophoneButton {
-            clickAppPermissionButton(true)
             verifyMicrophonePermissionPrompt(testPageSubstring)
             selectRememberPermissionDecision()
         }.clickPagePermissionButton(true) {
@@ -171,7 +166,7 @@ class SitePermissionsTest {
         navigationToolbar {
         }.enterURLAndEnterToBrowser(testPage.toUri()) {
         }.clickStartMicrophoneButton {
-            clickAppPermissionButton(false)
+        }.clickPagePermissionButton(false) {
         }
         browserScreen {
             verifyPageContent("Microphone not allowed")
@@ -184,7 +179,6 @@ class SitePermissionsTest {
         }.enterURLAndEnterToBrowser(testPage.toUri()) {
             waitForPageToLoad()
         }.clickStartCameraButton {
-            clickAppPermissionButton(true)
             verifyCameraPermissionPrompt(testPageSubstring)
         }.clickPagePermissionButton(false) {
             verifyPageContent("Camera not allowed")
@@ -200,7 +194,6 @@ class SitePermissionsTest {
         }.enterURLAndEnterToBrowser(testPage.toUri()) {
             waitForPageToLoad()
         }.clickStartCameraButton {
-            clickAppPermissionButton(true)
             verifyCameraPermissionPrompt(testPageSubstring)
             selectRememberPermissionDecision()
         }.clickPagePermissionButton(false) {
@@ -220,7 +213,6 @@ class SitePermissionsTest {
         }.enterURLAndEnterToBrowser(testPage.toUri()) {
             waitForPageToLoad()
         }.clickStartCameraButton {
-            clickAppPermissionButton(true)
             verifyCameraPermissionPrompt(testPageSubstring)
             selectRememberPermissionDecision()
         }.clickPagePermissionButton(true) {
@@ -239,8 +231,7 @@ class SitePermissionsTest {
         navigationToolbar {
         }.enterURLAndEnterToBrowser(testPage.toUri()) {
         }.clickStartCameraButton {
-            clickAppPermissionButton(false)
-        }
+        }.clickPagePermissionButton(false) { }
         browserScreen {
             verifyPageContent("Camera not allowed")
         }
@@ -279,7 +270,6 @@ class SitePermissionsTest {
         navigationToolbar {
         }.enterURLAndEnterToBrowser(testPage.toUri()) {
         }.clickGetLocationButton {
-            clickAppPermissionButton(true)
             verifyLocationPermissionPrompt(testPageSubstring)
         }.clickPagePermissionButton(true) {
             verifyPageContent("longitude")
@@ -293,7 +283,6 @@ class SitePermissionsTest {
         navigationToolbar {
         }.enterURLAndEnterToBrowser(testPage.toUri()) {
         }.clickGetLocationButton {
-            clickAppPermissionButton(true)
             verifyLocationPermissionPrompt(testPageSubstring)
         }.clickPagePermissionButton(false) {
             verifyPageContent("User denied geolocation prompt")

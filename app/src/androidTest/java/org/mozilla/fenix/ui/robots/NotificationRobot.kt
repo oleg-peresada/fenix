@@ -5,7 +5,6 @@
 package org.mozilla.fenix.ui.robots
 
 import androidx.test.uiautomator.By.text
-import androidx.test.uiautomator.UiObjectNotFoundException
 import androidx.test.uiautomator.UiScrollable
 import androidx.test.uiautomator.UiSelector
 import androidx.test.uiautomator.Until
@@ -18,19 +17,28 @@ import org.mozilla.fenix.helpers.ext.waitNotNull
 class NotificationRobot {
 
     fun verifySystemNotificationExists(notificationMessage: String) {
-        var notificationFound = false
+        val notification = UiSelector().text(notificationMessage)
+        var notificationFound = mDevice.findObject(notification).waitForExists(waitingTime)
 
-        do {
-            try {
-                notificationFound = notificationTray().getChildByText(
-                    UiSelector().text(notificationMessage), notificationMessage, true
-                ).waitForExists(waitingTime)
-                assertTrue(notificationFound)
-            } catch (e: UiObjectNotFoundException) {
-                notificationTray().scrollForward()
-                mDevice.waitForIdle()
+        while (!notificationFound) {
+            notificationTray().swipeUp(2)
+            notificationFound = mDevice.findObject(notification).waitForExists(waitingTime)
+        }
+
+        assertTrue(notificationFound)
+    }
+
+    fun clearNotifications() {
+        if (clearButton.exists()) {
+            clearButton.click()
+        } else {
+            notificationTray().flingToEnd(3)
+            if (clearButton.exists()) {
+                clearButton.click()
+            } else if (notificationTray().exists()) {
+                mDevice.pressBack()
             }
-        } while (!notificationFound)
+        }
     }
 
     fun verifySystemNotificationGone(notificationMessage: String) {
@@ -51,19 +59,30 @@ class NotificationRobot {
         assertPrivateTabsNotification()
     }
 
-    fun clickSystemNotificationControlButton(action: String) {
+    fun clickMediaNotificationControlButton(action: String) {
         mediaSystemNotificationButton(action).waitForExists(waitingTime)
         mediaSystemNotificationButton(action).click()
+    }
+
+    fun clickDownloadNotificationControlButton(action: String) {
+        downloadSystemNotificationButton(action).waitForExists(waitingTime)
+        downloadSystemNotificationButton(action).click()
     }
 
     fun verifyMediaSystemNotificationButtonState(action: String) {
         assertTrue(mediaSystemNotificationButton(action).waitForExists(waitingTime))
     }
 
+    fun verifyDownloadSystemNotificationButtonState(action: String) {
+        assertTrue(downloadSystemNotificationButton(action).waitForExists(waitingTime))
+    }
+
     fun expandNotificationMessage() {
         while (!notificationHeader.exists()) {
-            notificationTray().scrollForward()
+            notificationTray().swipeUp(2)
         }
+
+        notificationTray().scrollForward(1)
         notificationHeader.click()
     }
 
@@ -92,16 +111,23 @@ private fun assertPrivateTabsNotification() {
 private fun closePrivateTabsNotification() =
     mDevice.findObject(UiSelector().text("Close private tabs"))
 
-private fun mediaSystemNotificationButton(action: String) =
+private fun downloadSystemNotificationButton(action: String) =
     mDevice.findObject(
         UiSelector()
             .resourceId("android:id/action0")
             .descriptionContains(action)
     )
 
+private fun mediaSystemNotificationButton(action: String) =
+    mDevice.findObject(
+        UiSelector()
+            .resourceId("com.android.systemui:id/action0")
+            .descriptionContains(action)
+    )
+
 private fun notificationTray() = UiScrollable(
     UiSelector().resourceId("com.android.systemui:id/notification_stack_scroller")
-)
+).setAsVerticalList()
 
 private val notificationHeader =
     mDevice.findObject(
@@ -109,3 +135,5 @@ private val notificationHeader =
             .resourceId("android:id/app_name_text")
             .text(appName)
     )
+
+private val clearButton = mDevice.findObject(UiSelector().resourceId("com.android.systemui:id/btn_clear_all"))

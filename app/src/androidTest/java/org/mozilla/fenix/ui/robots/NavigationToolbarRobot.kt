@@ -12,12 +12,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.NoMatchingViewException
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -96,6 +98,8 @@ class NavigationToolbarRobot {
             sessionLoadedIdlingResource = SessionLoadedIdlingResource()
 
             openEditURLView()
+
+            dismissContextualHint()
 
             awesomeBar().setText(url.toString())
             mDevice.pressEnter()
@@ -334,5 +338,14 @@ inline fun runWithIdleRes(ir: IdlingResource?, pendingCheck: () -> Unit) {
         pendingCheck()
     } finally {
         IdlingRegistry.getInstance().unregister(ir)
+    }
+}
+
+private fun dismissContextualHint() {
+    try {
+        onView(withId(R.id.homeOnboardingDialogFragment)).check(matches(isDisplayed()))
+        onView(withId(R.id.close_info_banner)).perform().click()
+    } catch (e: NoMatchingViewException) {
+        // Do nothing
     }
 }

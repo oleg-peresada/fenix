@@ -4,6 +4,8 @@
 
 package org.mozilla.fenix.ui
 
+import android.os.Build
+import android.view.autofill.AutofillManager
 import androidx.core.net.toUri
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
@@ -18,6 +20,7 @@ import org.mozilla.fenix.helpers.AndroidAssetDispatcher
 import org.mozilla.fenix.helpers.HomeActivityIntentTestRule
 import org.mozilla.fenix.helpers.TestAssetHelper
 import org.mozilla.fenix.helpers.TestHelper
+import org.mozilla.fenix.helpers.TestHelper.appContext
 import org.mozilla.fenix.helpers.TestHelper.openAppFromExternalLink
 import org.mozilla.fenix.helpers.TestHelper.restartApp
 import org.mozilla.fenix.ui.robots.addToHomeScreen
@@ -50,6 +53,12 @@ class SettingsPrivacyTest {
 
         val settings = activityTestRule.activity.applicationContext.settings()
         settings.shouldShowJumpBackInCFR = false
+
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
+            val autofillManager: AutofillManager =
+                appContext.getSystemService(AutofillManager::class.java)
+            autofillManager.disableAutofillServices()
+        }
     }
 
     @After

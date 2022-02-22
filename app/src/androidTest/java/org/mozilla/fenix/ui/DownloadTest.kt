@@ -6,7 +6,6 @@ package org.mozilla.fenix.ui
 
 import androidx.core.net.toUri
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.test.rule.GrantPermissionRule
 import androidx.test.uiautomator.UiDevice
 import org.junit.After
 import org.junit.Before
@@ -44,23 +43,21 @@ class DownloadTest {
     @JvmField
     val retryTestRule = RetryTestRule(3)
 
-    @get:Rule
-    var mGrantPermissions = GrantPermissionRule.grant(
-        android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        android.Manifest.permission.READ_EXTERNAL_STORAGE
-    )
-
     @Before
     fun setUp() {
         // disabling the jump-back-in pop-up that interferes with the tests.
         featureSettingsHelper.setJumpBackCFREnabled(false)
         // disabling the PWA CFR on 3rd visit
         featureSettingsHelper.disablePwaCFR(true)
+        // clear all existing notifications
+        notificationShade {
+            mDevice.openNotification()
+            clearNotifications()
+        }
     }
 
     @After
     fun tearDown() {
-        deleteDownloadFromStorage(downloadFile)
         featureSettingsHelper.resetAllFeatureFlags()
     }
 
@@ -124,10 +121,11 @@ class DownloadTest {
         }.clickDownload {}
         mDevice.openNotification()
         notificationShade {
+            verifySystemNotificationExists("Firefox Fenix")
             expandNotificationMessage()
-            clickSystemNotificationControlButton("Pause")
-            clickSystemNotificationControlButton("Resume")
-            clickSystemNotificationControlButton("Cancel")
+            clickDownloadNotificationControlButton("Pause")
+            clickDownloadNotificationControlButton("Resume")
+            clickDownloadNotificationControlButton("Cancel")
             mDevice.pressBack()
         }
         browserScreen {
@@ -162,8 +160,8 @@ class DownloadTest {
             verifyDownloadedFileIcon()
             openDownloadedFile(downloadFile)
             verifyPhotosAppOpens()
-            mDevice.pressBack()
-            deleteDownloadFromStorage(downloadFile)
+            deleteDownloadFromStorage()
+            waitForDownloadsListToExist()
         }.exitDownloadsManagerToBrowser {
         }.openThreeDotMenu {
         }.openDownloadsManager {
