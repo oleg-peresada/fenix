@@ -39,9 +39,9 @@ gcloud:
 
   test-targets:
    - class org.mozilla.fenix.ui.SitePermissionsTest
-   - class org.mozilla.fenix.ui.DownloadTest
-   - notPackage org.mozilla.fenix.screenshots
-   - notPackage org.mozilla.fenix.syncintegration
+#   - class org.mozilla.fenix.ui.DownloadTest
+#   - notPackage org.mozilla.fenix.screenshots
+#   - notPackage org.mozilla.fenix.syncintegration
 
   device:
    - model: Pixel3

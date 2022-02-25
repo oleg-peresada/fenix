@@ -13,20 +13,11 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.mozilla.fenix.R
 import org.mozilla.fenix.helpers.TestAssetHelper.waitingTime
-import org.mozilla.fenix.helpers.TestHelper
 import org.mozilla.fenix.helpers.TestHelper.getPermissionAllowID
 import org.mozilla.fenix.helpers.TestHelper.packageName
 import org.mozilla.fenix.helpers.click
 
 class SitePermissionsRobot {
-    fun clickGrantAppPermissionButton() {
-        TestHelper.grantPermission()
-    }
-
-    fun clickDenyAppPermissionButton() {
-        TestHelper.denyPermission()
-    }
-
     fun verifyMicrophonePermissionPrompt(url: String) {
         assertTrue(
             mDevice.findObject(UiSelector().text("Allow $url to use your microphone?"))
