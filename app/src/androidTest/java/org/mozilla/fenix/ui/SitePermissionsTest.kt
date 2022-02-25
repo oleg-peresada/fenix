@@ -6,12 +6,14 @@ package org.mozilla.fenix.ui
 
 import android.Manifest
 import androidx.core.net.toUri
-import androidx.test.rule.GrantPermissionRule
+import androidx.test.platform.app.InstrumentationRegistry
+import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.mozilla.fenix.customannotations.SmokeTest
 import org.mozilla.fenix.helpers.HomeActivityIntentTestRule
+import org.mozilla.fenix.helpers.TestHelper.packageName
 import org.mozilla.fenix.ui.robots.browserScreen
 import org.mozilla.fenix.ui.robots.navigationToolbar
 
@@ -27,11 +29,19 @@ class SitePermissionsTest {
     @get:Rule
     val activityTestRule = HomeActivityIntentTestRule()
 
-    @get:Rule
-    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
-        Manifest.permission.RECORD_AUDIO,
-        Manifest.permission.CAMERA
-    )
+//    @get:Rule
+//    val grantPermissionRule: GrantPermissionRule = GrantPermissionRule.grant(
+//        Manifest.permission.RECORD_AUDIO,
+//        Manifest.permission.CAMERA
+//    )
+//
+    @Before
+    fun setUp() {
+        with(InstrumentationRegistry.getInstrumentation().uiAutomation) {
+            grantRuntimePermission(packageName, Manifest.permission.RECORD_AUDIO)
+            grantRuntimePermission(packageName, Manifest.permission.CAMERA)
+        }
+    }
 
 //    @Rule
 //    @JvmField
